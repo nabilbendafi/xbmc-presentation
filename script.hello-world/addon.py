@@ -14,3 +14,6 @@ if __name__ == '__main__':
     # print on dialog box
     dialog = Dialog()
     dialog.ok('Hello world!', description)
+
+    # print on notification box
+    dialog.notification('Hello world!', description, time=3000)
