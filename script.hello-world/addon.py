@@ -11,9 +11,15 @@ if __name__ == '__main__':
     addon = Addon()
     description = addon.getAddonInfo('description')
 
+    # fetch username setting
+    username = addon.getSetting('username')
+
     # print on dialog box
     dialog = Dialog()
-    dialog.ok('Hello world!', description)
+    dialog.ok('Hello %s!' % username, description)
+
+    # fetch timeout setting
+    timeout = float(addon.getSetting('timeout'))
 
     # print on notification box
-    dialog.notification('Hello world!', description, time=3000)
+    dialog.notification('Hello world!', description, time=int(timeout))
