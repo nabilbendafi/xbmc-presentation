@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+  <string id="32000">Bonjour</string>
+  <string id="32001">le monde!</string>
+  <string id="33001">Nom d'utilisateur</string>
+  <string id="33002">N carte de crédit</string>
+  <string id="33003">Date</string>
+  <string id="33004">Temps</string>
+  <string id="33005">Chemin</string>
+  <string id="33006">Muet</string>
+  <string id="33007">Adresse IP</string>
+</strings>

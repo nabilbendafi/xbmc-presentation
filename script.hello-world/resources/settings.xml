@@ -3,12 +3,12 @@
   <category label="General">
     <setting id="debug" type="bool" label="debug" default="false"/>
     <setting id="timeout" type="slider" label="timeout" default="1000" range="1000,1000,10000"/>
-    <setting id="username" type="text" label="username" default="John Doe"/>
-    <setting id="cardnumber" type="number" label="cardnumber" default="007"/>
-    <setting id="expirationdate" type="date" label="expiration date" default="1970-01-01"/>
-    <setting id="time" type="time" label="time" default="00:00"/>
-    <setting id="filepath" type="file" label="filepath" value="smb://somewhere"/>
-    <setting id="mute" type="action" label="mute" action="Mute"/>
-    <setting id="ipaddress" type="ipaddress" label="ip address" default="127.0.0.1" />
+    <setting id="username" type="text" label="33001" default="John Doe"/>
+    <setting id="cardnumber" type="number" label="33002" default="007"/>
+    <setting id="expirationdate" type="date" label="33003" default="1970-01-01"/>
+    <setting id="time" type="time" label="33004" default="00:00"/>
+    <setting id="filepath" type="file" label="33005" value="smb://somewhere"/>
+    <setting id="mute" type="action" label="33006" action="Mute"/>
+    <setting id="ipaddress" type="ipaddress" label="33007" default="127.0.0.1" />
   </category>
 </settings>
