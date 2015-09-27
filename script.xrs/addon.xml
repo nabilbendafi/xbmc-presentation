@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.xrs" name="XBMC RSS Stalker" version="0.0.1" provider-name="Nabil Bendafi">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="xbmc.addon" version="12.0.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="addon.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">XRS - XBMC RSS Stalker</summary>
+    <description lang="en">A simple RSS feed reader (based on GRS - http://github.com/lize/grs)</description>
+    <description lang="fr">Un simple lecteur de flux RSS (basé sur GRS - http://github.com/lize/grs)</description>
+    <disclaimer lang="en">For bugs, requests or general questions visit /dev/null</disclaimer>
+    <disclaimer lang="fr">Pour bugs, demandes ou questions générales visiter /dev/null</disclaimer> 
+    <language>en fr</language>
+    <platform>all</platform>
+    <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+    <forum/>
+    <website/>
+    <email>nabil@bendafi.fr</email>
+    <source>http://github.com/nabilbendafi/xbmc-presentation/tree/master/script.xrs</source>
+  </extension>
+</addon>
