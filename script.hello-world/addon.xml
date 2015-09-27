@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.hello-world" name="Hello world" version="0.0.1" provider-name="nabil">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="xbmc.addon" version="12.0.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="addon.py">
+    <!--executable, image, video, audio-->
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">"Hello world"</summary>
+    <description lang="en">A simple "Hello world" add-on exemple</description>
+    <description lang="fr">Un exemple simple d'extension</description>
+    <disclaimer lang="en">For bugs, requests or general questions visit /dev/null</disclaimer>
+    <disclaimer lang="fr">Pour bugs, demandes ou questions générales visiter /dev/null</disclaimer> 
+    <disclaimer lang="sv">För buggar, önskemål och frågor, besök /dev/null</disclaimer> 
+    <language>en fr sv</language>
+    <!--all, linux, osx, ios, windx, android-->
+    <platform>all</platform>
+    <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+    <forum/>
+    <website/>
+    <email>nabil@bendafi.fr</email>
+    <source>http://github.com/nabilbendafi/xbmc-presentation/script.hello-world</source>
+  </extension>
+</addon>
