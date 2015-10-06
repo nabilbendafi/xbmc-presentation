@@ -1,5 +1,6 @@
 import re
 import urllib
+import webbrowser
 from xml.etree import ElementTree
 
 import xbmc
@@ -127,6 +128,10 @@ class XRSWindow(pyxbmct.AddonFullWindow):
         self.draw_layout()
         self.connect_controls()
 
+    def _activated(self):
+        """Open selected feed's article in webbrowser."""
+        webbrowser.open('www.google.fr')
+
     def draw_layout(self):
         """Draw elements on the grid."""
         # place the close button on the grid.
@@ -144,6 +149,9 @@ class XRSWindow(pyxbmct.AddonFullWindow):
 
     def connect_controls(self):
         """Register actions."""
+        # Connect feed's article to webbrowser function
+        self.connect(self.feed, self._activated)
+
         # Connect close button and BACK to close() function.
         self.connect(self.close_button, self.close)
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
