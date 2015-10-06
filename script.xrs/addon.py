@@ -20,6 +20,49 @@ if debug:
         xbmc.log('Couldn\'t attach Pydev!', xbmc.LOGERROR)
 
 
+class Article(object):
+
+    """Abstracts a feed article."""
+
+    def __init__(self, feed, tag):
+        """Constructor."""
+        super(Article, self).__init__()
+        self.feed = feed
+        """article's parent feed"""
+        self.title = ''
+        """article's title"""
+        self.description = ''
+        """article's description"""
+        self.guid = ''
+        """article's guid"""
+        self.tag = tag
+        """article's tag"""
+
+    @property
+    def read(self):
+        return False
+
+
+class Feed(pyxbmct.List):
+
+    """Abstracts a RSS feed."""
+
+    def __init__(self, name='Sam & Max', url='http://sametmax.com/feed/'):
+        """Constructor."""
+        super(Feed, self).__init__()
+        self.name = name
+        """feed's name"""
+        self.url = url
+        """feed's url"""
+        self.articles = []
+        """feed's articles"""
+        self.raw = ''
+        """feed's raw XML stream"""
+
+    def update(self):
+        """Refresh RSS feed content."""
+        pass
+
 class XRSWindow(pyxbmct.AddonFullWindow):
 
     """Main application window."""
