@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-  <string id="33000">Intervalle de mise à jour</string>
+  <string id="32000">Debug</string>
+  <string id="32001">Hôte</string>
+  <string id="32002">Port</string>
+  <string id="32003">Intervalle de mise à jour</string>
 </strings>
