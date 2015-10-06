@@ -35,12 +35,36 @@ class Article(object):
         """article's parent feed"""
         self.title = ''
         """article's title"""
+        self.link = ''
+        """article's link"""
         self.description = ''
         """article's description"""
         self.guid = ''
         """article's guid"""
         self.tag = tag
         """article's tag"""
+
+        # title
+        title = tag.find(self.feed.namespace + 'title').text
+        self.title = title.strip() if title else ''
+
+        # link
+        link_tag = tag.find(self.feed.namespace + 'link')
+        self.link = link_tag.attrib.get('href') or link_tag.text
+
+        # description
+        for name in ('description', 'summary', 'content'):
+            desc_tag = tag.find(self.feed.namespace + name)
+            if desc_tag is not None and (desc_tag.text or len(desc_tag)):
+                self.description = (desc_tag.text or ElementTree.tostring(
+                    desc_tag[0], encoding='unicode'))
+
+        # guid
+        for name in ('id', 'guid', 'link'):
+            guid_tag = tag.find(self.feed.namespace + name)
+            if guid_tag is not None and guid_tag.text:
+                self.guid = guid_tag.text
+                break
 
     @property
     def read(self):
