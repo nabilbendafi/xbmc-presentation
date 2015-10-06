@@ -1,3 +1,7 @@
+import re
+import urllib
+from xml.etree import ElementTree
+
 import xbmc
 from xbmcaddon import Addon
 import pyxbmct.addonwindow as pyxbmct
@@ -52,6 +56,8 @@ class Feed(pyxbmct.List):
         super(Feed, self).__init__()
         self.name = name
         """feed's name"""
+        self.namespace = ''
+        """feed's namespace"""
         self.url = url
         """feed's url"""
         self.articles = []
@@ -61,7 +67,17 @@ class Feed(pyxbmct.List):
 
     def update(self):
         """Refresh RSS feed content."""
-        pass
+        try:
+            self.raw = urllib.urlopen(self.url).read()
+        except:
+            xbmc.log('Couldn\'t fetch %s data from %s !' % (self.name, self.url),
+                     xbmc.LOGERROR)
+        # parse raw data
+        xml = ElementTree.fromstring(self.raw)
+        self.namespace = (re.findall('\{.*\}', xml.tag) or ['']).pop()
+        self.articles = [
+            Article(self, tag) for tag_name in ('item', 'entry')
+            for tag in xml.iter(self.namespace + tag_name)]
 
 class XRSWindow(pyxbmct.AddonFullWindow):
 
