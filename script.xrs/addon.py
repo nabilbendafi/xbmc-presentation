@@ -118,6 +118,8 @@ class XRSWindow(pyxbmct.AddonFullWindow):
         """grid rows"""
         self.columns = 8
         """grid columns"""
+        self.feed = Feed()
+        """RSS feed"""
         self.close_button = pyxbmct.Button('Close')
         """close button"""
 
@@ -129,10 +131,19 @@ class XRSWindow(pyxbmct.AddonFullWindow):
         """Draw elements on the grid."""
         # place the close button on the grid.
         self.placeControl(self.close_button, 11, 3, columnspan=2)
+        # place the feed on the grid.
+        self.placeControl(self.feed, 0, 0,
+                          columnspan=self.columns, rowspan=self.rows - 1)
+
+        if self.feed.size():
+            self.setFocus(self.feed)
+        else:
+            self.setFocus(self.close_button)
+
+        self.feed.update()
 
     def connect_controls(self):
         """Register actions."""
-
         # Connect close button and BACK to close() function.
         self.connect(self.close_button, self.close)
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
