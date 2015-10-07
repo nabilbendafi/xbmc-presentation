@@ -5,6 +5,7 @@ from xml.etree import ElementTree
 
 import xbmc
 from xbmcaddon import Addon
+import xbmcgui
 import pyxbmct.addonwindow as pyxbmct
 
 
@@ -25,51 +26,68 @@ if debug:
         xbmc.log('Couldn\'t attach Pydev!', xbmc.LOGERROR)
 
 
-class Article(object):
+class Article(xbmcgui.ListItem):
 
     """Abstracts a feed article."""
 
-    def __init__(self, feed, tag):
+    def __new__(cls, feed, tag, *args, **kwargs):
         """Constructor."""
-        super(Article, self).__init__()
-        self.feed = feed
+        article = xbmcgui.ListItem.__new__(cls, *args, **kwargs)
+
+        article.feed = feed
         """article's parent feed"""
-        self.title = ''
+        article.title = ''
         """article's title"""
-        self.link = ''
+        article.link = ''
         """article's link"""
-        self.description = ''
+        article.description = ''
         """article's description"""
-        self.guid = ''
+        article.guid = ''
         """article's guid"""
-        self.tag = tag
+        article.tag = tag
         """article's tag"""
 
         # title
-        title = tag.find(self.feed.namespace + 'title').text
-        self.title = title.strip() if title else ''
+        title = tag.find(article.feed.namespace + 'title').text
+        article.title = '[B]' + title.strip() + '[/B]' if title else ''
+        # label is needed by lower level xbmcgui.ListItem
+        article.setLabel(article.title)
 
         # link
-        link_tag = tag.find(self.feed.namespace + 'link')
-        self.link = link_tag.attrib.get('href') or link_tag.text
+        link_tag = tag.find(article.feed.namespace + 'link')
+        article.link = link_tag.attrib.get('href') or link_tag.text
 
         # description
         for name in ('description', 'summary', 'content'):
-            desc_tag = tag.find(self.feed.namespace + name)
+            desc_tag = tag.find(article.feed.namespace + name)
             if desc_tag is not None and (desc_tag.text or len(desc_tag)):
-                self.description = (desc_tag.text or ElementTree.tostring(
+                article.description = (desc_tag.text or ElementTree.tostring(
                     desc_tag[0], encoding='unicode'))
 
         # guid
         for name in ('id', 'guid', 'link'):
-            guid_tag = tag.find(self.feed.namespace + name)
+            guid_tag = tag.find(article.feed.namespace + name)
             if guid_tag is not None and guid_tag.text:
-                self.guid = guid_tag.text
+                article.guid = guid_tag.text
                 break
+
+        return article
+
+    def update_status(self, read=True):
+        """Update article status
+        Toggle bold font
+
+        :param: read Status of the article
+        """
+        if read:
+            self.title = self.title.replace('[B]', '').replace('[/B]', '')
+        else:
+            self.title = '[B]' + self.title + '[/B]'
+        self.setLabel(self.title)
 
     @property
     def read(self):
-        return False
+        return re.match('^\[B\]', self.title)
 
 
 class Feed(pyxbmct.List):
@@ -95,14 +113,30 @@ class Feed(pyxbmct.List):
         try:
             self.raw = urllib.urlopen(self.url).read()
         except:
-            xbmc.log('Couldn\'t fetch %s data from %s !' % (self.name, self.url),
-                     xbmc.LOGERROR)
+            xbmc.log('Couldn\'t fetch %s data from %s !' %
+                     (self.name, self.url), xbmc.LOGERROR)
         # parse raw data
         xml = ElementTree.fromstring(self.raw)
         self.namespace = (re.findall('\{.*\}', xml.tag) or ['']).pop()
         self.articles = [
             Article(self, tag) for tag_name in ('item', 'entry')
             for tag in xml.iter(self.namespace + tag_name)]
+
+        # append articles to feed
+        self.addItems(self.articles)
+
+    def read_article(self):
+        """Retrieve the selected article from the list
+
+        :returns: article to read
+        """
+        selected_item = super(Feed, self).getSelectedPosition()
+        if selected_item != -1:
+            article = self.articles[selected_item]
+            article.update_status()
+            return article
+        return None
+
 
 class XRSWindow(pyxbmct.AddonFullWindow):
 
@@ -130,7 +164,9 @@ class XRSWindow(pyxbmct.AddonFullWindow):
 
     def _activated(self):
         """Open selected feed's article in webbrowser."""
-        webbrowser.open('www.google.fr')
+        link = self.feed.read_article().link
+        if link:
+            webbrowser.open(link)
 
     def draw_layout(self):
         """Draw elements on the grid."""
