@@ -7,4 +7,7 @@
     <setting type="sep" visible="false"/>
     <setting id="interval" type="number" label="32003" default="30"/>
   </category>
+  <category label="33000">
+    <setting id="rss_feed_file" type="file" label="33001" default="special://profile/RssFeeds.xml" />
+  </category>
 </settings>

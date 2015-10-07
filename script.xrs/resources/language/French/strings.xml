@@ -4,4 +4,6 @@
   <string id="32001">Hôte</string>
   <string id="32002">Port</string>
   <string id="32003">Intervalle de mise à jour</string>
+  <string id="33000">Flux RSS</string>
+  <string id="33001">Sources flux RSS</string>
 </strings>

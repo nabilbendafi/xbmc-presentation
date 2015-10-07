@@ -94,19 +94,22 @@ class Feed(pyxbmct.List):
 
     """Abstracts a RSS feed."""
 
-    def __init__(self, name='Sam & Max', url='http://sametmax.com/feed/'):
+    def __new__(cls, name='Sam & Max', url='http://sametmax.com/feed/', *args, **kwargs):
         """Constructor."""
-        super(Feed, self).__init__()
-        self.name = name
+        feed = pyxbmct.List.__new__(cls, *args, **kwargs)
+
+        feed.name = name
         """feed's name"""
-        self.namespace = ''
+        feed.namespace = ''
         """feed's namespace"""
-        self.url = url
+        feed.url = url
         """feed's url"""
-        self.articles = []
+        feed.articles = []
         """feed's articles"""
-        self.raw = ''
+        feed.raw = ''
         """feed's raw XML stream"""
+
+        return feed
 
     def update(self):
         """Refresh RSS feed content."""
@@ -153,18 +156,19 @@ class XRSWindow(pyxbmct.AddonFullWindow):
         """grid rows"""
         self.columns = 8
         """grid columns"""
-        self.feed = Feed()
-        """RSS feed"""
+        self.feeds = []
+        """RSS feeds"""
         self.close_button = pyxbmct.Button('Close')
         """close button"""
 
         self.setGeometry(self.width, self.height, self.rows, self.columns)
+        self.source_feeds()
         self.draw_layout()
         self.connect_controls()
 
-    def _activated(self):
+    def _activated(self, feed):
         """Open selected feed's article in webbrowser."""
-        link = self.feed.read_article().link
+        link = feed.read_article().link
         if link:
             webbrowser.open(link)
 
@@ -172,25 +176,48 @@ class XRSWindow(pyxbmct.AddonFullWindow):
         """Draw elements on the grid."""
         # place the close button on the grid.
         self.placeControl(self.close_button, 11, 3, columnspan=2)
-        # place the feed on the grid.
-        self.placeControl(self.feed, 0, 0,
-                          columnspan=self.columns, rowspan=self.rows - 1)
+        # place the feeds on the grid.
+        for feed in self.feeds:
+            self.placeControl(feed, 0, 0,
+                              columnspan=self.columns, rowspan=self.rows - 1)
 
-        if self.feed.size():
-            self.setFocus(self.feed)
-        else:
-            self.setFocus(self.close_button)
+            if feed.size():
+                self.setFocus(feed)
+            else:
+                self.setFocus(self.close_button)
 
-        self.feed.update()
+            feed.update()
 
     def connect_controls(self):
         """Register actions."""
         # Connect feed's article to webbrowser function
-        self.connect(self.feed, self._activated)
+        for feed in self.feeds:
+            self.connect(feed, lambda: self._activated(feed))
 
         # Connect close button and BACK to close() function.
         self.connect(self.close_button, self.close)
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
+
+    def source_feeds(self):
+        """Source RSS feed source from file."""
+        filename = xbmc.translatePath(addon.getSetting('rss_feed_file'))
+        try:
+            f = open(filename)
+
+            # parse RSS feed sources file
+            xml = ElementTree.fromstring(f.read())
+            for feed_elem in xml.iter('feed'):
+                # create a feed for each entry
+                feed = Feed(url=feed_elem.text)
+                self.feeds.append(feed)
+
+            f.close()
+        except:
+            xbmc.log('Couldn\'t open %s file!' % filename,
+                     xbmc.LOGERROR)
+            # fallback
+            feed = Feed()
+            self.feeds.append(feed)
 
 
 if __name__ == '__main__':
