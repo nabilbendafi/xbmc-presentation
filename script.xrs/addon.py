@@ -158,6 +158,8 @@ class XRSWindow(pyxbmct.AddonFullWindow):
         """grid columns"""
         self.feeds = []
         """RSS feeds"""
+        self.current_feed = None
+        """current RSS feed"""
         self.close_button = pyxbmct.Button('Close')
         """close button"""
 
@@ -165,38 +167,94 @@ class XRSWindow(pyxbmct.AddonFullWindow):
         self.source_feeds()
         self.draw_layout()
         self.connect_controls()
+        self.set_navigation()
 
     def _activated(self, feed):
         """Open selected feed's article in webbrowser."""
-        link = feed.read_article().link
-        if link:
-            webbrowser.open(link)
+        if feed == self.current_feed:
+            # Change title font
+            link = feed.read_article().link
+            if link:
+                # Opent link in the browser
+                webbrowser.open(link)
 
     def draw_layout(self):
         """Draw elements on the grid."""
         # place the close button on the grid.
-        self.placeControl(self.close_button, 11, 3, columnspan=2)
+        try:
+            self.placeControl(self.close_button, 11, 3, columnspan=2)
+        except:
+            # control aready exists
+            pass
+
         # place the feeds on the grid.
-        for feed in self.feeds:
-            self.placeControl(feed, 0, 0,
+        if self.current_feed:
+            self.placeControl(self.current_feed, 0, 0,
                               columnspan=self.columns, rowspan=self.rows - 1)
 
-            if feed.size():
-                self.setFocus(feed)
+            self.current_feed.update()
+
+            if self.current_feed.size():
+                self.setFocus(self.current_feed)
             else:
                 self.setFocus(self.close_button)
+        else:
+            self.setFocus(self.close_button)
 
-            feed.update()
+    def onAction(self, action):
+        """Handle control action.
 
+        :param: action Action received by this window. 
+        """
+        # feed navigation: left, right
+        if action in [pyxbmct.ACTION_MOVE_LEFT, pyxbmct.ACTION_MOVE_RIGHT]:
+            if len(self.feeds)-1:
+                index = self.feeds.index(self.current_feed)
+                prev_index = (index-1) % len(self.feeds)
+                next_index = (index+1) % len(self.feeds)
+            else:
+                prev_index = next_index = 0
+
+            # hide current feed
+            self.removeControl(self.current_feed)
+            self.current_feed.setVisible(False)
+            # disconnect it
+            self.disconnect(self.current_feed)
+
+            if action == pyxbmct.ACTION_MOVE_LEFT:
+                self.current_feed = self.feeds[prev_index]
+            if action == pyxbmct.ACTION_MOVE_RIGHT:
+                self.current_feed = self.feeds[next_index]
+
+            # redraw
+            self.draw_layout()
+            # reconnect
+            self.connect_controls()
+            self.set_navigation()
+        else:
+            # call super method
+            super(XRSWindow, self).onAction(action)
+        
     def connect_controls(self):
         """Register actions."""
-        # Connect feed's article to webbrowser function
-        for feed in self.feeds:
-            self.connect(feed, lambda: self._activated(feed))
+        # connect feed's article to webbrowser function
+        if self.current_feed:
+            self.connect(self.current_feed,
+                         lambda: self._activated(self.current_feed))
 
-        # Connect close button and BACK to close() function.
+        # connect close button and BACK to close() function.
         self.connect(self.close_button, self.close)
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
+
+    def set_navigation(self):
+        """Define navigation between feed elements."""
+        # feed navigation: up, down
+        self.current_feed.controlUp(self.close_button)
+        self.current_feed.controlDown(self.close_button)
+
+        # close_button navigation: up, down, right and left
+        self.close_button.setNavigation(self.current_feed, self.current_feed,
+                                        self.close_button, self.close_button)
 
     def source_feeds(self):
         """Source RSS feed source from file."""
@@ -210,6 +268,7 @@ class XRSWindow(pyxbmct.AddonFullWindow):
                 # create a feed for each entry
                 feed = Feed(url=feed_elem.text)
                 self.feeds.append(feed)
+                self.current_feed = feed
 
             f.close()
         except:
@@ -217,6 +276,7 @@ class XRSWindow(pyxbmct.AddonFullWindow):
                      xbmc.LOGERROR)
             # fallback
             feed = Feed()
+            self.current_feed = feed
             self.feeds.append(feed)
 
 
