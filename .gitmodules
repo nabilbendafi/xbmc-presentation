@@ -1,0 +1,3 @@
+[submodule "plugin.video.animeseed"]
+	path = plugin.video.animeseed
+	url = git@github.com:nabilbendafi/plugin.video.animeseed
